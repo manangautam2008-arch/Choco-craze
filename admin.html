@@ -1,0 +1,583 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Choco Craze | Admin Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --dark:#351C15;
+    --chocolate:#6E3B27;
+    --caramel:#E8C9A5;
+    --cream:#FFF8EF;
+    --white:#fff;
+    --muted:#8b817b;
+    --border:#eaded2;
+}
+
+* { box-sizing:border-box; }
+
+body {
+    margin:0;
+    font-family:'DM Sans',sans-serif;
+    background:var(--cream);
+    color:var(--dark);
+}
+
+button, input, select { font:inherit; }
+
+header {
+    background:var(--dark);
+    color:white;
+    padding:20px 6%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+}
+
+.brand {
+    font-family:'Playfair Display',serif;
+    font-size:25px;
+}
+
+.brand span { color:var(--caramel); }
+
+.header-right {
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+header a {
+    color:white;
+    text-decoration:none;
+    font-size:13px;
+}
+
+.container {
+    width:min(1200px,92%);
+    margin:35px auto;
+}
+
+h1 {
+    font-family:'Playfair Display',serif;
+    font-size:32px;
+    margin-bottom:5px;
+}
+
+.subtitle { color:var(--muted); margin-top:0; }
+
+.panel {
+    background:white;
+    border:1px solid var(--border);
+    border-radius:15px;
+    padding:24px;
+    margin-bottom:22px;
+}
+
+.login-panel {
+    max-width:420px;
+    margin:70px auto;
+}
+
+input, select {
+    width:100%;
+    padding:13px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:white;
+    margin:8px 0 15px;
+}
+
+button {
+    border:0;
+    border-radius:8px;
+    padding:12px 18px;
+    background:var(--chocolate);
+    color:white;
+    cursor:pointer;
+    font-weight:600;
+}
+
+button:hover { background:var(--dark); }
+
+button:disabled { opacity:.6; cursor:not-allowed; }
+
+.secondary {
+    background:#eee2d6;
+    color:var(--dark);
+}
+
+.secondary:hover { background:var(--caramel); }
+
+.logout { background:#8b3a2d; }
+
+.stats {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+    margin:25px 0;
+}
+
+.stat {
+    background:white;
+    border:1px solid var(--border);
+    padding:22px;
+    border-radius:13px;
+}
+
+.stat p {
+    color:var(--muted);
+    margin:0 0 10px;
+    font-size:13px;
+}
+
+.stat strong { font-size:25px; }
+
+.toolbar {
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin:18px 0;
+}
+
+.toolbar input, .toolbar select {
+    width:auto;
+    min-width:180px;
+    margin:0;
+}
+
+.table-wrap { overflow-x:auto; }
+
+table {
+    width:100%;
+    border-collapse:collapse;
+    min-width:850px;
+}
+
+th, td {
+    text-align:left;
+    padding:15px 12px;
+    border-bottom:1px solid var(--border);
+    vertical-align:top;
+    font-size:13px;
+}
+
+th {
+    color:var(--muted);
+    font-weight:700;
+}
+
+.items {
+    line-height:1.8;
+    min-width:150px;
+}
+
+.status-select {
+    min-width:155px;
+    margin:0 0 8px;
+    padding:9px;
+}
+
+.status-btn {
+    padding:9px 12px;
+    font-size:12px;
+}
+
+.message {
+    margin:12px 0;
+    font-size:13px;
+    color:#9a3326;
+}
+
+.success { color:#287344; }
+
+.hidden { display:none !important; }
+
+.empty {
+    text-align:center;
+    color:var(--muted);
+    padding:35px;
+}
+
+.order-date { color:var(--muted); font-size:12px; }
+
+@media(max-width:650px) {
+    header { padding:17px 4%; }
+    .brand { font-size:20px; }
+    .container { margin:22px auto; }
+    h1 { font-size:26px; }
+    .stats { grid-template-columns:1fr; }
+    .stat { padding:17px; }
+    .panel { padding:16px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="brand">Choco <span>Craze</span></div>
+    <div class="header-right">
+        <a href="/">View Website</a>
+        <button id="logoutBtn" class="logout hidden">Logout</button>
+    </div>
+</header>
+
+<main class="container">
+
+<section id="loginSection" class="panel login-panel">
+    <h1>Admin Login</h1>
+    <p class="subtitle">Welcome to your private Choco Craze dashboard.</p>
+
+    <form id="loginForm">
+        <label for="password">Admin Password</label>
+        <input id="password" type="password" placeholder="Enter admin password" required>
+        <button type="submit" style="width:100%">Login</button>
+    </form>
+
+    <p id="loginMessage" class="message"></p>
+</section>
+
+<section id="dashboard" class="hidden">
+
+    <h1>Order Dashboard</h1>
+    <p class="subtitle">Manage your dessert orders and deliveries.</p>
+
+    <div class="stats">
+        <div class="stat">
+            <p>Total Orders</p>
+            <strong id="totalOrders">0</strong>
+        </div>
+
+        <div class="stat">
+            <p>Delivered Orders</p>
+            <strong id="deliveredOrders">0</strong>
+        </div>
+
+        <div class="stat">
+            <p>Total Sales</p>
+            <strong id="totalSales">₹0</strong>
+        </div>
+    </div>
+
+    <section class="panel">
+        <h2>Customer Orders</h2>
+
+        <div class="toolbar">
+            <input type="search" id="searchInput" placeholder="Search order ID or customer">
+            <select id="statusFilter">
+                <option value="">All Statuses</option>
+                <option>Order Placed</option>
+                <option>Confirmed</option>
+                <option>Preparing</option>
+                <option>Out for Delivery</option>
+                <option>Delivered</option>
+                <option>Cancelled</option>
+            </select>
+            <button class="secondary" id="refreshBtn">Refresh Orders</button>
+        </div>
+
+        <p id="dashboardMessage" class="message"></p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Customer</th>
+                        <th>Items</th>
+                        <th>Bill</th>
+                        <th>Status</th>
+                        <th>Update</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+</section>
+</main>
+
+<script>
+const loginSection = document.getElementById("loginSection");
+const dashboard = document.getElementById("dashboard");
+const loginForm = document.getElementById("loginForm");
+const loginMessage = document.getElementById("loginMessage");
+const dashboardMessage = document.getElementById("dashboardMessage");
+const logoutBtn = document.getElementById("logoutBtn");
+const ordersBody = document.getElementById("ordersBody");
+
+let allOrders = [];
+
+const statuses = [
+    "Order Placed",
+    "Confirmed",
+    "Preparing",
+    "Out for Delivery",
+    "Delivered",
+    "Cancelled"
+];
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#39;"
+    })[char]);
+}
+
+function formatMoney(value) {
+    return "₹" + Number(value).toLocaleString("en-IN");
+}
+
+function showDashboard() {
+    loginSection.classList.add("hidden");
+    dashboard.classList.remove("hidden");
+    logoutBtn.classList.remove("hidden");
+}
+
+function showLogin() {
+    loginSection.classList.remove("hidden");
+    dashboard.classList.add("hidden");
+    logoutBtn.classList.add("hidden");
+}
+
+async function checkSession() {
+    try {
+        const response = await fetch("/api/admin/session");
+
+        if (response.ok) {
+            showDashboard();
+            await loadOrders();
+        } else {
+            showLogin();
+        }
+    } catch {
+        showLogin();
+        loginMessage.textContent = "Cannot connect to the server.";
+    }
+}
+
+loginForm.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    loginMessage.textContent = "Logging in...";
+
+    try {
+        const response = await fetch("/api/admin/login", {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({
+                password:document.getElementById("password").value
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || "Login failed.");
+        }
+
+        document.getElementById("password").value = "";
+        loginMessage.textContent = "";
+        showDashboard();
+        await loadOrders();
+
+    } catch(error) {
+        loginMessage.textContent = error.message;
+    }
+});
+
+logoutBtn.addEventListener("click", async () => {
+    try {
+        await fetch("/api/admin/logout", { method:"POST" });
+    } finally {
+        allOrders = [];
+        showLogin();
+    }
+});
+
+async function loadOrders() {
+    dashboardMessage.textContent = "Loading orders...";
+
+    try {
+        const response = await fetch("/api/admin/orders");
+        const result = await response.json();
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                showLogin();
+            }
+            throw new Error(result.message || "Unable to load orders.");
+        }
+
+        allOrders = result.orders || [];
+        updateStatistics();
+        renderOrders();
+
+        dashboardMessage.textContent =
+            allOrders.length + " order(s) loaded.";
+        dashboardMessage.className = "message success";
+
+    } catch(error) {
+        dashboardMessage.textContent = error.message;
+        dashboardMessage.className = "message";
+    }
+}
+
+function updateStatistics() {
+    document.getElementById("totalOrders").textContent =
+        allOrders.length;
+
+    document.getElementById("deliveredOrders").textContent =
+        allOrders.filter(order => order.status === "Delivered").length;
+
+    const sales = allOrders
+        .filter(order => order.status !== "Cancelled")
+        .reduce((sum, order) => sum + Number(order.total || 0), 0);
+
+    document.getElementById("totalSales").textContent =
+        formatMoney(sales);
+}
+
+function renderOrders() {
+    const search = document.getElementById("searchInput")
+        .value.trim().toLowerCase();
+
+    const filter = document.getElementById("statusFilter").value;
+
+    const filtered = allOrders.filter(order => {
+        const matchesSearch =
+            String(order.order_id).toLowerCase().includes(search) ||
+            String(order.customer_name).toLowerCase().includes(search);
+
+        const matchesStatus = !filter || order.status === filter;
+
+        return matchesSearch && matchesStatus;
+    });
+
+    if (!filtered.length) {
+        ordersBody.innerHTML =
+            '<tr><td colspan="6" class="empty">No orders found.</td></tr>';
+        return;
+    }
+
+    ordersBody.innerHTML = filtered.map(order => {
+        const items = Array.isArray(order.items)
+            ? order.items.map(item => `
+                <div>
+                    <strong>${escapeHTML(item.name)}</strong>
+                    × ${Number(item.quantity)}
+                    <br>
+                    <small>${escapeHTML(item.details || "")}</small>
+                </div>
+            `).join("")
+            : "No items";
+
+        const date = new Date(order.created_at).toLocaleString("en-IN");
+
+        const statusOptions = statuses.map(status => `
+            <option value="${escapeHTML(status)}"
+                ${order.status === status ? "selected" : ""}>
+                ${escapeHTML(status)}
+            </option>
+        `).join("");
+
+        return `
+        <tr>
+            <td>
+                <strong>${escapeHTML(order.order_id)}</strong>
+                <div class="order-date">${escapeHTML(date)}</div>
+            </td>
+
+            <td>
+                <strong>${escapeHTML(order.customer_name)}</strong>
+                <br>${escapeHTML(order.phone)}
+                <br><small>${escapeHTML(order.address)}</small>
+            </td>
+
+            <td class="items">${items}</td>
+
+            <td>
+                <strong>${formatMoney(order.total)}</strong>
+                <br><small>Subtotal: ${formatMoney(order.subtotal)}</small>
+                <br><small>Discount: ${formatMoney(order.discount)}</small>
+                <br><small>${escapeHTML(order.payment)}</small>
+            </td>
+
+            <td>
+                <select class="status-select"
+                    id="status-${escapeHTML(order.order_id)}">
+                    ${statusOptions}
+                </select>
+            </td>
+
+            <td>
+                <button class="status-btn"
+                    onclick="updateStatus('${escapeHTML(order.order_id)}')">
+                    Save
+                </button>
+            </td>
+        </tr>`;
+    }).join("");
+}
+
+async function updateStatus(orderId) {
+    const select = document.getElementById("status-" + orderId);
+    const status = select.value;
+
+    dashboardMessage.textContent = "Updating order...";
+
+    try {
+        const response = await fetch(
+            "/api/admin/orders/" + encodeURIComponent(orderId) + "/status",
+            {
+                method:"PATCH",
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({status})
+            }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || "Status update failed.");
+        }
+
+        dashboardMessage.textContent =
+            "Order " + orderId + " updated to " + status + ".";
+
+        dashboardMessage.className = "message success";
+
+        await loadOrders();
+
+    } catch(error) {
+        dashboardMessage.textContent = error.message;
+        dashboardMessage.className = "message";
+    }
+}
+
+document.getElementById("refreshBtn")
+    .addEventListener("click", loadOrders);
+
+document.getElementById("searchInput")
+    .addEventListener("input", renderOrders);
+
+document.getElementById("statusFilter")
+    .addEventListener("change", renderOrders);
+
+checkSession();
+</script>
+
+</body>
+</html>
